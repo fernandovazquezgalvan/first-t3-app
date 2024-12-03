@@ -1,6 +1,11 @@
 "use client";
 import { useState } from "react";
 
+interface ApiResponse {
+  length?: number;
+  error?: string;
+}
+
 export default function HomePage() {
   const [name, setName] = useState("");
   const [charCount, setCharCount] = useState<number | null>(null);
@@ -17,13 +22,15 @@ export default function HomePage() {
         body: JSON.stringify({ text: name }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as ApiResponse;
       
       if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data.error ?? "Something went wrong");
       }
 
-      setCharCount(data.length);
+      if (typeof data.length === "number") {
+        setCharCount(data.length);
+      }
     } catch (error) {
       console.error("Error calculating length:", error);
       alert("Failed to calculate length");
