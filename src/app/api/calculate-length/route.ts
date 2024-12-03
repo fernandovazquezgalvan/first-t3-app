@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 
+interface RequestBody {
+  text: string;
+}
+
 export async function POST(request: Request) {
   try {
-    // Get the request body
-    const body = await request.json();
+    // Get the request body with type assertion
+    const body = (await request.json()) as RequestBody;
     const { text } = body;
 
     if (!text || typeof text !== "string") {
@@ -17,9 +21,10 @@ export async function POST(request: Request) {
     const length = text.trim().length;
 
     return NextResponse.json({ length });
-  } catch (error) {
+  } catch (err) {
+    const error = err as Error;
     return NextResponse.json(
-      { error: "Invalid request" },
+      { error: error.message || "Invalid request" },
       { status: 400 }
     );
   }
